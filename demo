@@ -1,0 +1,33 @@
+├── prisma/                         # Configurações do Banco de Dados
+│   ├── prisma.config.ts            # (Opcional) Exporta configurações extras ou instâncias customizadas
+│   ├── prismaService.ts            # O Singleton que estende o PrismaClient (injetado nos outros serviços)
+│   └── schema.prisma               # O arquivo mais importante: define suas tabelas (User e Transaction) e relacionamentos
+│
+├── README.md                       # Documentação: como rodar o Docker, rotas da API e decisões técnicas
+│
+├── src/
+│   ├── app.module.ts               # Módulo raiz: importa o AuthModule, UsersModule, TransactionsModule e Prisma
+│   │
+│   ├── auth/                       # Fluxo de Segurança
+│   │   ├── auth.controller.ts      # Rotas de /auth/login e /auth/register
+│   │   ├── auth.module.ts          # Configura o JwtModule (tempo de expiração do token e chave secreta)
+│   │   ├── auth.service.ts         # Lógica de validação: checar se a senha bate (bcrypt) e gerar o JWT
+│   │   └── guards/                 # Arquivo jwt-auth.guard.ts: protege as rotas verificando o token no header
+│   │
+│   ├── transactions/               # Domínio Financeiro (Regras de Negócio)
+│   │   ├── dto/                    # Data Transfer Objects
+│   │   │   ├── create-transaction.dto.ts # Valida entrada: valor (positivo?), tipo (entrada/saida?), descricao
+│   │   │   └── update-transaction.dto.ts # Permite atualizar campos parciais da transação
+│   │   ├── entities/               # Classe TypeScript que representa a transação (usada para tipagem interna)
+│   │   ├── transactions.controller.ts # Rotas: POST /, GET / (listagem), GET /summary (o resumo), DELETE /:id
+│   │   ├── transactions.module.ts  # Amarra o Controller ao Service e injeta o PrismaService
+│   │   └── transactions.service.ts # Onde o cálculo acontece: somar totais de entradas/saídas e o saldo final
+│   │
+│   ├── users/                      # Domínio de Usuário
+│   │   ├── dto/                    # Validação de e-mail (IsEmail), nome e senha forte no cadastro
+│   │   ├── entities/               # Classe representando o usuário (sem a senha, por segurança)
+│   │   ├── users.controller.ts     # Rota para o usuário ver seus próprios dados (/users/me)
+│   │   ├── users.service.ts        # Métodos para buscar usuário por e-mail ou criar novo no banco
+│   │   └── users.module.ts         # Exporta o UsersService para que o AuthModule consiga usá-lo no login
+│   │
+│   ├── main.ts                     # Configura o ValidationPipe (para os DTOs funcionarem) e o prefixo /api
