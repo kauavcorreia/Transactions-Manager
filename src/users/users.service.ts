@@ -38,6 +38,53 @@ export class UsersService { // classe de serviço para lidar com as operações 
     return user;
   } 
 
+  async findAll(){
+    // busca de todos os usuários usando o Prisma Client
+    const users = await this.prisma.user.findMany({
+      select: {
+        id: true,
+        name: true,
+        email: true,
+      },
+
+    })
+    return users;
+  }
+
+  async findOne(id: string){
+    // busca de um usuário pelo ID usando o Prisma Client 
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        password : true,
+      },
+    });
+    return user;
+  }
+
+  async update(id: string, updateUserDto){
+    // atualização de um usuário pelo ID usando o Prisma Client
+    const user = await this.prisma.user.update({
+      where: { id },
+      data: updateUserDto,
+      select: {
+        id: true,
+        name: true,
+        email: true,
+      },
+    });
+    return user;
+  }
+
+  async delete(id: string){
+    // exclusão de um usuário pelo ID usando o Prisma Client
+    await this.prisma.user.delete({
+      where: { id },
+    });
+  }
 
 }
 
